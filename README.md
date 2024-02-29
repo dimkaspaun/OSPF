@@ -1,4 +1,4 @@
-# HW21 - OSPF
+#OSPF
 
 ## Введение
 
@@ -305,37 +305,11 @@ pathd=no
 
 - Посмотреть в linux: ip a | grep inet
 
-```bash
-ip a | grep "inet "
-    inet 127.0.0.1/8 scope host lo
-    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3
-    inet 10.0.10.1/30 brd 10.0.10.3 scope global enp0s8
-    inet 10.0.12.1/30 brd 10.0.12.3 scope global enp0s9
-    inet 192.168.10.1/24 brd 192.168.10.255 scope global enp0s10
-    inet 192.168.50.10/24 brd 192.168.50.255 scope global enp0s16
-```
+![2024-02-29_09-11-20](https://github.com/dimkaspaun/OSPF/assets/156161074/5f9e1e74-962c-467d-a985-059edab9d295)
 
 - Зайти в интерфейс FRR и посмотреть информацию об интерфейсах
 
-```bash
-vtysh
-
-Hello, this is FRRouting (version 8.2.2).
-Copyright 1996-2005 Kunihiro Ishiguro, et al.
-
-show interface brief
-
-Interface       Status  VRF             Addresses
----------       ------  ---             ---------
-enp0s3          up      default         10.0.2.15/24
-enp0s8          up      default         10.0.10.1/30
-enp0s9          up      default         10.0.12.1/30
-enp0s10         up      default         192.168.10.1/24
-enp0s16         up      default         192.168.50.10/24
-lo              up      default   
-
-exit
-```
+![2024-02-28_16-54-25](https://github.com/dimkaspaun/OSPF/assets/156161074/a0b611a5-2002-4529-beef-ae1fb06951bc)
 
 В обоих примерах мы увидем имена сетевых интерфейсов, их ip-адреса и маски подсети. Исходя из схемы мы понимаем, что для настройки OSPF нам достаточно описать интерфейсы enp0s8, enp0s9, enp0s10
 
@@ -421,13 +395,10 @@ default-information originate always
 
 ```bash
 ls -l /etc/frr
-
-total 20
--rw-r----- 1 frr frr 2620 Jul  6 20:57 daemons
--rw-r----- 1 frr frr 2404 Jul  6 21:05 frr.conf
--rw-r----- 1 frr frr 5411 Mar 13 20:43 support_bundle_commands.conf
--rw-r----- 1 frr frr   32 Mar 13 20:43 vtysh.conf
 ```
+
+![2024-02-28_16-53-25](https://github.com/dimkaspaun/OSPF/assets/156161074/fdc35576-97d2-4aab-ae71-5f0726e8c32d)
+
 
 Если права или владелец файла указан неправильно, то нужно поменять владельца и назначить правильные права, например:
 
@@ -447,32 +418,9 @@ systemctl enable frr
 
 ```bash
 systemctl status frr
-
-● frr.service - FRRouting
-     Loaded: loaded (/lib/systemd/system/frr.service; enabled; vendor preset: enabled)
-     Active: active (running) since Wed 2022-07-06 21:08:10 UTC; 12s ago
-       Docs: https://frrouting.readthedocs.io/en/latest/setup.html
-   Main PID: 4819 (watchfrr)
-     Status: "FRR Operational"
-      Tasks: 9 (limit: 1131)
-     Memory: 13.3M
-     CGroup: /system.slice/frr.service
-             ├─4819 /usr/lib/frr/watchfrr -d -F traditional zebra ospfd staticd
-             ├─4837 /usr/lib/frr/zebra -d -F traditional -A 127.0.0.1 -s 90000000
-             ├─4842 /usr/lib/frr/ospfd -d -F traditional -A 127.0.0.1
-             └─4845 /usr/lib/frr/staticd -d -F traditional -A 127.0.0.1
-
-Jul 06 21:08:05 router1 zebra[4837]: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
-Jul 06 21:08:05 router1 ospfd[4842]: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
-Jul 06 21:08:05 router1 staticd[4845]: [VTVCM-Y2NW3] Configuration Read in Took: 00:00:00
-Jul 06 21:08:05 router1 watchfrr[4819]: [ZJW5C-1EHNT] restart all process 4820 exited with non-zero status 2
-Jul 06 21:08:10 router1 watchfrr[4819]: [QDG3Y-BY5TN] zebra state -> up : connect succeeded
-Jul 06 21:08:10 router1 watchfrr[4819]: [QDG3Y-BY5TN] ospfd state -> up : connect succeeded
-Jul 06 21:08:10 router1 watchfrr[4819]: [QDG3Y-BY5TN] staticd state -> up : connect succeeded
-Jul 06 21:08:10 router1 frrinit.sh[4800]:  * Started watchfrr
-Jul 06 21:08:10 router1 watchfrr[4819]: [KWE5Q-QNGFC] all daemons up, doing startup-complete notify
-Jul 06 21:08:10 router1 systemd[1]: Started FRRouting.
 ```
+
+![2024-02-29_09-13-57](https://github.com/dimkaspaun/OSPF/assets/156161074/1c623ec4-b8ed-4b93-8988-806568b5cf22)
 
 Если мы правильно настроили OSPF, то с любого хоста нам должны быть доступны сети:
 
@@ -489,26 +437,19 @@ Jul 06 21:08:10 router1 systemd[1]: Started FRRouting.
 
 ```bash
 ping 192.168.30.1
-
-PING 192.168.30.1 (192.168.30.1) 56(84) bytes of data.
-64 bytes from 192.168.30.1: icmp_seq=1 ttl=64 time=0.391 ms
-64 bytes from 192.168.30.1: icmp_seq=2 ttl=64 time=0.345 ms
-64 bytes from 192.168.30.1: icmp_seq=3 ttl=64 time=0.608 ms
-64 bytes from 192.168.30.1: icmp_seq=4 ttl=64 time=0.555 ms
-^C
---- 192.168.30.1 ping statistics ---
-4 packets transmitted, 4 received, 0% packet loss, time 3072ms
-rtt min/avg/max/mdev = 0.345/0.474/0.608/0.109 ms
 ```
+
+![2024-02-29_09-14-25](https://github.com/dimkaspaun/OSPF/assets/156161074/baddb5a3-f898-4962-a14c-6104968ddacb)
+
 
 - Запустим трассировку до адреса 192.168.30.1
 
 ```bash
 traceroute 192.168.30.1
-
-traceroute to 192.168.30.1 (192.168.30.1), 30 hops max, 60 byte packets
- 1  192.168.30.1 (192.168.30.1)  0.775 ms  0.827 ms  0.807 ms
 ```
+
+![2024-02-29_09-14-54](https://github.com/dimkaspaun/OSPF/assets/156161074/104eaf0b-0cea-4e29-9f42-42785f4ba152)
+
 
 Попробуем отключить интерфейс enp0s9 и немного подождем и снова запустим трассировку до ip-адреса 192.168.30.1
 
@@ -516,15 +457,11 @@ traceroute to 192.168.30.1 (192.168.30.1), 30 hops max, 60 byte packets
 ifconfig enp0s9 down
 
 ip a | grep enp0s9
-4: enp0s9: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN group
-default qlen 1000
 
 traceroute 192.168.30.1
-
-traceroute to 192.168.30.1 (192.168.30.1), 30 hops max, 60 byte packets
- 1  10.0.10.2 (10.0.10.2)  0.536 ms  0.498 ms  0.484 ms
- 2  192.168.30.1 (192.168.30.1)  1.354 ms  1.337 ms  1.319 ms
 ```
+
+![2024-02-29_09-16-12](https://github.com/dimkaspaun/OSPF/assets/156161074/b8443f28-cf21-46d6-8b78-96906eb2d2e1)
 
 Как мы видим, после отключения интерфейса сеть 192.168.30.0/24 нам остаётся доступна.
 
@@ -930,12 +867,3 @@ symmetric_routing: false
 ```bash
 ansible-playbook -i ansible/hosts -l all ansible/provision.yml -t setup_ospf -e "host_key_checking=false"
 ```
-
-## Рекомендуемые источники
-
-- [Статья «OSPF»](https://ru.bmstu.wiki/OSPF_(Open_Shortest_Path_First)#.D0.A2.D0.B5.D1.80.D0.BC.D0.B8.D0.BD.D1.8B_.D0.B8_.D0.BE.D1.81.D0.BD.D0.BE.D0.B2.D0.BD.D1.8B.D0.B5_.D0.BF.D0.BE.D0.BD.D1.8F.D1.82.D0.B8.D1.8F_OSPF)
-- [Статья «IP Routing: OSPF Configuration Guide»](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/iproute_ospf/configuration/xe-16/iro-xe-16-book/iro-cfg.html)
-- [Документация FRR](http://docs.frrouting.org/en/latest/overview.html)
-- [Статья «Принципы таблицы маршрутизации. Асимметричная маршрутизация»](http://marshrutizatciia.ru/principy-tablicy-marshrutizacii-asimmetrichnaya-marshrutizaciya.html)
-- [Различия межлу протоколами OSPF](https://da2001.ru/CCNA_5.02/2/course/module8/8.3.1.3/8.3.1.3.html#:~:text=%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20OSPFv3%20%D0%B4%D0%BB%D1%8F%20%D0%BE%D0%B4%D0%BD%D0%BE%D0%B9%20%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D0%B8&text=%D0%98%D1%81%D1%85%D0%BE%D0%B4%D0%BD%D1%8B%D0%B9%20%D0%B0%D0%B4%D1%80%D0%B5%D1%81%20%E2%80%94%20%D1%81%D0%BE%D0%BE%D0%B1%D1%89%D0%B5%D0%BD%D0%B8%D1%8F%20OSPFv2%20%D0%BF%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%B0%D1%8E%D1%82,%D1%82%D0%B8%D0%BF%D0%B0%20link%2Dlocal%20%D0%B2%D1%8B%D1%85%D0%BE%D0%B4%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D1%84%D0%B5%D0%B9%D1%81%D0%B0)
-- [Документация по Templating(jinja2)](https://docs.ansible.com/ansible/2.9/user_guide/playbooks_templating.html)
